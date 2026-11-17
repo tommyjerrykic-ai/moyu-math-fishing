@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#eff5e8">
+  <title>摸魚研究所｜空間向量釣魚試玩版</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="questions.js"></script>
+  <script defer src="core.js"></script>
+  <script defer src="art.js"></script>
+  <script defer src="math-entry.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <section id="startup-notice" class="startup-notice" aria-labelledby="startup-title">
+    <div class="startup-card">
+      <p class="startup-kicker">摸魚研究所 · 遊戲啟動聲明</p>
+      <h1 id="startup-title">歡迎進入遊戲！</h1>
+      <p class="startup-intro">本遊戲以數學學習及娛樂為目的，希望大家在探索與挑戰中享受學習的樂趣。開始前，請留意以下事項：</p>
+      <ol class="startup-rules">
+        <li><h2>學習用途</h2><p>這個遊戲的目的是希望同學能在遊戲的同時複習所學知識，遊戲中的排名僅供娛樂和鼓勵。</p></li>
+        <li><h2>內容說明</h2><p>遊戲中的角色、故事及情節均屬虛構。題目與解說如有錯漏，歡迎向老師反映。</p></li>
+        <li><h2>適度遊玩</h2><p>請合理安排遊玩時間，適時休息，避免影響日常學習與作息。</p></li>
+        <li><h2>公平參與</h2><p>請自行思考、誠實作答，尊重其他玩家，共同維持良好的遊戲環境，禁止任何作弊行為以及盜號行為。</p></li>
+        <li><h2>開放時間</h2><p>遊戲可能不會長時間開放遊玩，僅在大測期間開放遊玩。</p></li>
+      </ol>
+      <button id="agree-btn" type="button" class="primary-button startup-agree">我同意</button>
+    </div>
+  </section>
+  <div class="app-shell" hidden inert>
+    <section id="home-screen" class="home-screen" aria-label="遊戲主界面">
+      <div class="home-landscape"><button id="fullscreen-btn" data-fullscreen class="fullscreen-button" aria-label="全屏" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path class="fullscreen-expand" d="M8 4H4v4m12-4h4v4M4 16v4h4m8 0h4v-4"/><path class="fullscreen-collapse" d="M4 8h4V4m12 4h-4V4M8 20v-4H4m12 4v-4h4"/></svg></span></button><canvas id="home-scene" width="480" height="420" role="img" aria-label="像素池塘與正在釣魚的主角背影"></canvas></div>
+      <div class="home-menu">
+        <canvas id="brand-fish" width="128" height="88" aria-hidden="true" hidden></canvas>
+        <h1 class="home-title"><span class="sr-only">摸魚研究所</span><img class="home-title-art" src="assets/home-title-logo-v1.png" alt="" aria-hidden="true" fetchpriority="high"></h1>
+        <div class="menu-buttons">
+          <button id="start-btn" class="menu-button menu-start"><span aria-hidden="true">▶</span>開始遊戲</button>
+          <button id="collection-btn" class="menu-button"><span aria-hidden="true">▦</span>魚類圖鑑 <b id="collection-count">0/76</b></button>
+          <button class="menu-button menu-locked" disabled><span aria-hidden="true">♜</span>排行榜 <small>暫未開啟</small></button>
+          <button id="settings-btn" class="menu-button"><span aria-hidden="true">⚙</span>設定</button>
+        </div>
+      </div>
+    </section>
+
+    <main id="game-screen" class="game-layout" hidden>
+      <section class="fishing-panel" aria-label="釣魚區">
+        <div class="scene-wrap">
+          <canvas id="scene" width="480" height="420" role="img" aria-label="可愛像素池塘：戴帽子的主角背對玩家，坐在木碼頭上，面向水面釣魚。"></canvas>
+          <div class="location-tag"><span class="location-dot"></span><div><small id="location-number" hidden></small><strong id="location-name">發呆池</strong></div></div>
+          <button id="game-fullscreen-btn" data-fullscreen class="home-return" aria-label="全屏" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path class="fullscreen-expand" d="M8 4H4v4m12-4h4v4M4 16v4h4m8 0h4v-4"/><path class="fullscreen-collapse" d="M4 8h4V4m12 4h-4V4M8 20v-4H4m12 4v-4h4"/></svg></span></button>
+          <div id="bite-bubble" class="bite-bubble" hidden>！</div>
+          <div id="character-speech" class="character-speech" role="status" hidden><span class="speech-avatar" aria-hidden="true"></span><span id="speech-text"></span></div>
+          <div id="catch-animation" class="catch-animation" aria-hidden="true" hidden><span class="water-splash"></span><canvas id="flying-fish" width="160" height="100"></canvas></div>
+          <div id="scene-result" class="scene-result" hidden></div>
+          <span id="bite-clock" class="bite-clock"></span>
+          <div class="fishing-controls">
+          <div class="cast-actions">
+            <button id="cast-btn" class="action-button cast"><span class="button-symbol" aria-hidden="true"><img src="assets/cast-icon-v1.png" alt="" draggable="false"></span><span class="button-label">拋竿</span></button>
+            <button id="reel-btn" class="action-button reel" disabled><span class="button-symbol" aria-hidden="true"><img src="assets/reel-icon-v1.png" alt="" draggable="false"></span><span class="button-label">提竿</span></button>
+          </div>
+          </div>
+        </div>
+        <span id="fishing-status" class="sr-only" role="status"></span>
+      </section>
+
+      <section id="study-panel" class="study-panel" aria-label="題目及作答區">
+        <div id="panel-content"></div>
+      </section>
+    </main>
+    <p id="save-warning" class="save-warning" role="status" hidden>此瀏覽器無法儲存進度，關閉頁面後收藏可能消失。</p>
+  </div>
+
+  <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
+    <div class="dialog-header"><h2 id="settings-title">設定</h2><button class="close-button" data-close aria-label="關閉設定">×</button></div>
+    <div class="character-setting"><h3>主角</h3><div class="character-options" role="group" aria-label="主角性別"><button type="button" data-character="male" aria-pressed="true">男主角</button><button type="button" data-character="female" aria-pressed="false">女主角</button></div></div>
+    <div class="character-setting"><h3>釣魚地點</h3><div class="character-options" role="group" aria-label="釣魚地點"><button type="button" data-setting-location="pond" aria-pressed="true">發呆池</button><button type="button" data-setting-location="beach" aria-pressed="false">黑沙海灘</button><button type="button" data-setting-location="classroom" aria-pressed="false" hidden>氹坊課室</button></div></div>
+    <div class="volume-setting"><div class="volume-label"><label for="music-volume">背景音樂</label><output id="music-volume-value" for="music-volume">25%</output></div><input id="music-volume" type="range" min="0" max="100" step="1" value="25"></div>
+    <div class="volume-setting"><div class="volume-label"><label for="effects-volume">音效</label><output id="effects-volume-value" for="effects-volume">60%</output></div><input id="effects-volume" type="range" min="0" max="100" step="1" value="60"></div>
+  </dialog>
+  <dialog id="location-dialog" class="location-dialog" aria-labelledby="location-title">
+    <div class="dialog-header"><h2 id="location-title">更改地點</h2><button class="close-button" data-close aria-label="關閉地點選擇">×</button></div>
+    <div class="location-options">
+      <button id="current-location" data-location="pond" class="location-option"><span aria-hidden="true">01</span><strong>發呆池</strong><small>目前地點</small></button>
+      <button id="beach-location" data-location="beach" class="location-option"><span aria-hidden="true">02</span><strong>黑沙海灘</strong><small>前往釣魚</small></button>
+      <button id="classroom-location" data-location="classroom" class="location-option" disabled><span aria-hidden="true">03</span><strong>隱藏地點</strong><small>圖鑑超過 50% 解鎖</small></button>
+    </div>
+  </dialog>
+
+  <dialog id="collection-dialog" class="collection-dialog" aria-labelledby="collection-title">
+    <div class="dialog-header"><div><h2 id="collection-title">我的魚類圖鑑</h2></div><button class="close-button" data-close aria-label="關閉魚類圖鑑">×</button></div>
+    <div class="collection-content">
+    <dl class="collection-summary" aria-label="釣魚統計">
+      <div><dt>累計釣獲</dt><dd><strong id="collection-total">0</strong><span>次</span></dd></div>
+      <div><dt>圖鑑完成率</dt><dd><strong id="collection-percent">0%</strong><span id="collection-discovered">0 / 76 種</span></dd><div id="collection-progress" class="collection-progress" role="progressbar" aria-label="圖鑑完成率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="collection-progress-fill"></span></div></div>
+    </dl>
+
+    <div id="rarity-filters" class="rarity-filters" role="group" aria-label="依稀有度篩選"></div>
+    <div id="fish-grid" class="fish-grid"></div>
+    <p class="collection-footnote">魚訊出現權重：N 55% · R 28% · SR 12% · SSR 5%。每種魚有自己的基本釣到率。</p>
+    </div>
+  </dialog>
+  <dialog id="fish-detail-dialog" class="fish-detail-dialog" aria-labelledby="fish-detail-title">
+    <div class="dialog-header"><h2 id="fish-detail-title">魚類詳情</h2><button class="close-button" data-close aria-label="關閉魚類詳情">×</button></div>
+    <div id="fish-detail-content"></div>
+  </dialog>
+</body>
+</html>
