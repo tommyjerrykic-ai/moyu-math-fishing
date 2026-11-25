@@ -902,7 +902,7 @@ function gameAsset(path){if(!GAME_ASSETS[path])throw Error("Missing embedded res
         3
       ],
       "answerDisplay": "B、C、D",
-      "explanation": "A 符合相等向量的定義。<br>B 的兩個平行向量也可能方向相反。<br>C 可取兩個互為相反的非零向量，兩者不相等，但模相等。<br>D 的向量即使起點或終點不同，長度相等且方向相同時仍是相等向量。"
+      "explanation": "模相等且方向相同的兩個向量相等，起點、終點的位置不影響判斷。兩個平行且等長的向量也可能方向相反，此時向量不相等。"
     },
     {
       "id": "space-linear-07",
@@ -947,7 +947,7 @@ function gameAsset(path){if(!GAME_ASSETS[path])throw Error("Missing embedded res
         "若 A、B、C、D 四點不共面，則向量<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mover accent=\"true\"><mrow><mi>A</mi><mi>B</mi></mrow><mo>→</mo></mover></math>、<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mover accent=\"true\"><mrow><mi>A</mi><mi>C</mi></mrow><mo>→</mo></mover></math>、<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mover accent=\"true\"><mrow><mi>A</mi><mi>D</mi></mrow><mo>→</mo></mover></math>不共面。"
       ],
       "answer": 3,
-      "explanation": "平行向量所在直線也可以重合，所以 A 錯誤。任意兩個空間向量可平移到同一平面內，所以 B、C 錯誤。D 中三個向量同以 A 為起點，若三者共面，則 A、B、C、D 四點也共面，與已知矛盾。",
+      "explanation": "平行向量所在的直線也可以重合。任意兩個空間向量都能平移到同一平面內，即使原先所在直線異面。若 A、B、C、D 四點不共面，則由 A 指向 B、C、D 的三個向量不共面。",
       "answerDisplay": "若 A、B、C、D 四點不共面，則向量<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mover accent=\"true\"><mrow><mi>A</mi><mi>B</mi></mrow><mo>→</mo></mover></math>、<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mover accent=\"true\"><mrow><mi>A</mi><mi>C</mi></mrow><mo>→</mo></mover></math>、<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mover accent=\"true\"><mrow><mi>A</mi><mi>D</mi></mrow><mo>→</mo></mover></math>不共面。"
     },
     {
@@ -1028,7 +1028,7 @@ function gameAsset(path){if(!GAME_ASSETS[path])throw Error("Missing embedded res
         3
       ],
       "answerDisplay": "B、C、D",
-      "explanation": "A 錯誤，因為 AB、CD 可在兩條不同的平行直線上。<br>B 正確，兩向量共線且有公共點 A。<br>C 正確，因為<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mover accent=\"true\"><mrow><mi>a</mi></mrow><mo>→</mo></mover><mo>=</mo><mo>−</mo><mn>4</mn><mover accent=\"true\"><mrow><mi>b</mi></mrow><mo>→</mo></mover></math>。<br>D 正確，若任何一個係數非零，就可用其餘兩個向量表示該向量，與三個向量不共面矛盾。"
+      "explanation": "平行的兩個向量所在的直線可以是不同的平行直線。若兩向量從同一點 A 出發且平行，兩條線段的端點必共線。<br>題中給出的兩個線性組合互為 −4 倍，因此平行。三個不共面的向量中，任何一個都不能用另外兩個表示，所以線性組合等於零向量時，所有係數必須為零。"
     },
     {
       "id": "space-coplanar-07",
@@ -1089,7 +1089,7 @@ function gameAsset(path){if(!GAME_ASSETS[path])throw Error("Missing embedded res
         "<math><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover><mo>∥</mo><mover accent=\"true\"><mrow><mi>n</mi></mrow><mo>→</mo></mover></math>",
         "<math><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover><mo>⊥</mo><mover accent=\"true\"><mrow><mi>n</mi></mrow><mo>→</mo></mover></math>",
         "<math><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover></math> 既不平行於 <math><mover accent=\"true\"><mrow><mi>n</mi></mrow><mo>→</mo></mover></math>，也不垂直於 <math><mover accent=\"true\"><mrow><mi>n</mi></mrow><mo>→</mo></mover></math>",
-        "以上三種情況都有可能"
+        "平行、垂直或兩者皆非，三種情況都有可能"
       ],
       "answer": 1,
       "explanation": "因為 <math><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover><mo>·</mo><mover accent=\"true\"><mrow><mi>a</mi></mrow><mo>→</mo></mover><mo>=</mo><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover><mo>·</mo><mover accent=\"true\"><mrow><mi>b</mi></mrow><mo>→</mo></mover><mo>=</mo><mn>0</mn></math>，所以 <math><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover><mo>·</mo><mover accent=\"true\"><mrow><mi>n</mi></mrow><mo>→</mo></mover><mo>=</mo><mi>λ</mi><mo>(</mo><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover><mo>·</mo><mover accent=\"true\"><mrow><mi>a</mi></mrow><mo>→</mo></mover><mo>)</mo><mo>+</mo><mi>μ</mi><mo>(</mo><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover><mo>·</mo><mover accent=\"true\"><mrow><mi>b</mi></mrow><mo>→</mo></mover><mo>)</mo><mo>=</mo><mn>0</mn></math>。兩個非零向量的數量積為 0，所以 <math><mover accent=\"true\"><mrow><mi>m</mi></mrow><mo>→</mo></mover><mo>⊥</mo><mover accent=\"true\"><mrow><mi>n</mi></mrow><mo>→</mo></mover></math>。",
@@ -1629,7 +1629,7 @@ function gameAsset(path){if(!GAME_ASSETS[path])throw Error("Missing embedded res
         3
       ],
       "answerDisplay": "B、D",
-      "explanation": "B 是 <math><mo>−</mo><mn>2</mn><mover accent=\"true\"><mi>a</mi><mo>→</mo></mover></math>，D 是 <math><mo>−</mo><mover accent=\"true\"><mi>a</mi><mo>→</mo></mover></math>，兩者都是 <math><mover accent=\"true\"><mi>a</mi><mo>→</mo></mover></math> 的數倍。A、C 的分量與 <math><mover accent=\"true\"><mi>a</mi><mo>→</mo></mover></math> 的對應分量不成同一比例。"
+      "explanation": "坐標為 (−4, 6, −2) 和 (−2, 3, −1) 的向量，分別是已知向量的 −2 倍和 −1 倍，所以都與它平行。其餘各向量的三個分量與已知向量的對應分量不成同一比例。"
     },
     {
       "id": "space-coordinate-ops-07",
@@ -2028,7 +2028,7 @@ function gameAsset(path){if(!GAME_ASSETS[path])throw Error("Missing embedded res
         2
       ],
       "answerDisplay": "B、C",
-      "explanation": "斜率為 <math><msqrt><mn>3</mn></msqrt></math>，其傾斜角為 60°。x＝0 時 y＝−1，所以 y 軸截距為 −1。x＝<math><msqrt><mn>3</mn></msqrt></math> 時 y＝2，所以 A 的點不在直線上。"
+      "explanation": "直線的斜率是 <math><msqrt><mn>3</mn></msqrt></math>，因此傾斜角為 60°。令 x＝0，得 y＝−1，所以 y 軸截距為 −1。當 x＝<math><msqrt><mn>3</mn></msqrt></math> 時，y＝2，因此所給的點 (<math><msqrt><mn>3</mn></msqrt></math>, −2) 不在直線上。"
     },
     {
       "id": "line-point-slope-07",
@@ -4004,7 +4004,25 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
     if(phase==='question'&&questionStart)updateRateMeter((now-questionStart)/1000);
     // Game timing is independent of canvas rendering, including background tabs.
   }
-  function reelLine(){if(phase!=='bite')return;if(C.bitePhase(performance.now()-castStart,timing)!=='bite'){idle(true);return;}setPhase('hooking');playMotion('hook',650);status('主角正在提竿！');playEffect('reel');motionTimer=setTimeout(()=>{if(phase!=='hooking')return;targetFish=C.chooseFish(Math.random,location,save.collection);q=questions[save.questionIndex%questions.length];save.questionIndex++;persist();selected=null;attempts=0;answerHistory=[];questionStart=0;motion=null;setPhase('question');$('scene').dataset.action='question';status(targetFish.kind==='doll'?'洋娃娃上鈎了！回答題目後收竿。':targetFish.kind==='item'?'神秘道具上鈎了！回答題目後收竿。':'魚咬穩了！回答題目後收竿。');renderQuestion();questionStart=performance.now();},650);}
+  function reelLine(){if(phase!=='bite')return;if(C.bitePhase(performance.now()-castStart,timing)!=='bite'){idle(true);return;}setPhase('hooking');playMotion('hook',650);status('主角正在提竿！');playEffect('reel');motionTimer=setTimeout(()=>{if(phase!=='hooking')return;targetFish=C.chooseFish(Math.random,location,save.collection);q=shuffleOptions(questions[save.questionIndex%questions.length]);save.questionIndex++;persist();selected=null;attempts=0;answerHistory=[];questionStart=0;motion=null;setPhase('question');$('scene').dataset.action='question';status(targetFish.kind==='doll'?'洋娃娃上鈎了！回答題目後收竿。':targetFish.kind==='item'?'神秘道具上鈎了！回答題目後收竿。':'魚咬穩了！回答題目後收竿。');renderQuestion();questionStart=performance.now();},650);}
+  function shuffleOptions(question, random = Math.random) {
+    if (!question.options) return question;
+    const order = question.options.map((_, index) => index);
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    const options = order.map(index => question.options[index]);
+    if (question.type === 'multiple') {
+      const answer = order.flatMap((original, index) => question.answer.includes(original) ? [index] : []);
+      const answerDisplay = answer.map(index => 'ABCD'[index]).join('、');
+      return {...question, options, answer, answerDisplay};
+    }
+    return {...question, options, answer: order.indexOf(question.answer)};
+  }
+  function optionLog(index) {
+    return 'ABCD'[index] + '．' + GameCloud.plain(q.options[index]);
+  }
   function renderQuestion(){
     const multiple = q.type === 'multiple';
     panel.innerHTML=`<p class="mobile-question-note">${targetFish.kind==='doll'?'洋娃娃':targetFish.kind==='item'?'道具':'魚兒'}已上鈎 · 完成作答後返回釣點</p><div class="question-top"><span class="tag">${multiple?'多選題':q.type==='choice'?'選擇題':'填充題'}</span><div class="catch-meter"><span class="meter-name">釣到率</span><div id="live-rate-bar" class="meter-track" role="progressbar" aria-label="答對時的釣到率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}"><span id="live-rate-fill" class="meter-fill" style="width:${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}%"></span><span class="meter-baseline" aria-hidden="true"></span></div><strong id="live-rate-value">${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}%</strong><small>基本 ${C.effectiveBaseRate(targetFish,save.collection)}%${C.catchBonus(save.collection)?`（收藏 +${C.catchBonus(save.collection)}%）`:''}</small></div></div><div class="question-prompt">${q.prompt}</div>${q.figure || ""}${q.diagram?A.diagram(q.diagram):''}<form id="answer-form">${q.options?`<div class="options" role="group" aria-label="答案選項">${q.options.map((option,i)=>`<button type="button" class="option" data-option="${i}" aria-pressed="false"><span class="letter">${'ABCD'[i]}</span><span class="option-content">${option}</span></button>`).join('')}</div>`:`${q.coordinateLabels?'':'<div class="entry-heading"><span class="input-label">輸入答案</span></div>'}<div id="answer-entry" class="answer-entry" role="group" aria-label="數學答案"></div><div class="keypad" aria-label="數學數字鍵盤">${['7','8','9','⌫','4','5','6','清空','1','2','3','分數','±','0','.','根號',...(q.expressionKeys?['−','×']:[])].map(key=>`<button type="button" data-key="${key}" class="${['⌫','清空','分數','根號'].includes(key)?'utility tool-key':['±','−','×'].includes(key)?'symbol':''}" aria-label="${{'⌫':'刪除一個字元','清空':'清空答案','分數':'插入分數','根號':'插入根號','±':'切換正負號','−':'減號','×':'乘號'}[key]||key}">${key}</button>`).join('')}</div>`}${q.type==='fill'?'<p id="input-error" class="error-text" role="status"></p>':''}${q.type!=='choice'?`<button id="submit-answer" class="primary-button" type="submit"${multiple?' disabled':''}>確認答案</button>`:''}</form>`;
@@ -4036,7 +4054,7 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
       const chosen = [...panel.querySelectorAll('[data-option][aria-pressed="true"]')].map(button => Number(button.dataset.option));
       if (!chosen.length) return;
       isCorrect = chosen.length === q.answer.length && q.answer.every(index => chosen.includes(index));
-      submittedAnswer = chosen.map(index => 'ABCD'[index]).join('、');
+      submittedAnswer = chosen.map(optionLog).join('／');
     }
     else if(q.type==='choice'){if(selected===null)return;isCorrect=selected===q.answer;}
     else {
@@ -4057,7 +4075,7 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
         isCorrect = matches(value,q.answer);
       }
     }
-    answerHistory.push({answer:submittedAnswer ?? (q.type==='choice'?'ABCD'[selected]+'．'+GameCloud.plain(q.options[selected]):mathEntry.value()),correct:isCorrect,elapsedMs:Math.max(0,Math.round(performance.now()-questionStart))});
+    answerHistory.push({answer:submittedAnswer ?? (q.type==='choice'?optionLog(selected):mathEntry.value()),correct:isCorrect,elapsedMs:Math.max(0,Math.round(performance.now()-questionStart))});
     attempts++;
     if(!isCorrect&&attempts===1){say('手滑了，再答一次',0);if(q.type==='choice'){const old=panel.querySelector(`[data-option="${selected}"]`);old.disabled=true;old.classList.remove('selected');old.setAttribute('aria-pressed','false');selected=null;} else if (q.type === 'multiple') {
       panel.querySelectorAll('[data-option]').forEach(button => {
