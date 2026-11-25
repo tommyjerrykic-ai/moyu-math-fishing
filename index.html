@@ -628,6 +628,22 @@ body[data-location=classroom] [data-fullscreen]:not([aria-pressed=true]){color:#
 }
 .coordinate-component .math-slot { min-width: 1.55em; background: #edf3e8; }
 
+
+.option-content {
+  flex: 1 1 0%;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.option-math-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .12em;
+  max-width: none;
+  white-space: nowrap;
+}
+.option-math-line > math { flex: 0 0 auto; }
+
 </style>
 </head>
 <body>
@@ -4004,7 +4020,47 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
     if(phase==='question'&&questionStart)updateRateMeter((now-questionStart)/1000);
     // Game timing is independent of canvas rendering, including background tabs.
   }
-  function reelLine(){if(phase!=='bite')return;if(C.bitePhase(performance.now()-castStart,timing)!=='bite'){idle(true);return;}setPhase('hooking');playMotion('hook',650);status('主角正在提竿！');playEffect('reel');motionTimer=setTimeout(()=>{if(phase!=='hooking')return;targetFish=C.chooseFish(Math.random,location,save.collection);q=shuffleOptions(questions[save.questionIndex%questions.length]);save.questionIndex++;persist();selected=null;attempts=0;answerHistory=[];questionStart=0;motion=null;setPhase('question');$('scene').dataset.action='question';status(targetFish.kind==='doll'?'洋娃娃上鈎了！回答題目後收竿。':targetFish.kind==='item'?'神秘道具上鈎了！回答題目後收竿。':'魚咬穩了！回答題目後收竿。');renderQuestion();questionStart=performance.now();},650);}
+  function reelLine(){if(phase!=='bite')return;if(C.bitePhase(performance.now()-castStart,timing)!=='bite'){idle(true);return;}setPhase('hooking');playMotion('hook',650);status('主角正在提竿！');playEffect('reel');motionTimer=setTimeout(()=>{if(phase!=='hooking')return;targetFish=C.chooseFish(Math.random,location,save.collection);q=shuffleOptions(drawQuestion());save.questionIndex++;persist();selected=null;attempts=0;answerHistory=[];questionStart=0;motion=null;setPhase('question');$('scene').dataset.action='question';status(targetFish.kind==='doll'?'洋娃娃上鈎了！回答題目後收竿。':targetFish.kind==='item'?'神秘道具上鈎了！回答題目後收竿。':'魚咬穩了！回答題目後收竿。');renderQuestion();questionStart=performance.now();},650);}
+  const questionsById = new Map(questions.map(question => [question.id, question]));
+  const questionIds = [...questionsById.keys()];
+  const questionBankVersion = questionIds.join(',');
+  const sessionDecks = new Map();
+
+  function drawQuestion(random = Math.random) {
+    const key = storageKey + ':question-deck-v1';
+    let deck = sessionDecks.get(key);
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) deck = JSON.parse(stored);
+    } catch {}
+
+    const valid = deck?.bank === questionBankVersion && Array.isArray(deck.remaining)
+      && new Set(deck.remaining).size === deck.remaining.length
+      && deck.remaining.every(id => questionsById.has(id));
+    if (!valid || !deck.remaining.length) {
+      const last = questionsById.has(deck?.last) ? deck.last : null;
+      const remaining = questionIds.filter(id => id !== last);
+      // Put the previous round's last question aside for this first draw only.
+      deck = {bank:questionBankVersion, remaining, last};
+      if (!remaining.length) remaining.push(...questionIds);
+      const [id] = remaining.splice(Math.floor(random() * remaining.length),1);
+      if (last && id !== last) remaining.push(last);
+      deck.last = id;
+    } else {
+      const [id] = deck.remaining.splice(Math.floor(random() * deck.remaining.length),1);
+      deck.last = id;
+    }
+    sessionDecks.set(key,deck);
+    try { localStorage.setItem(key,JSON.stringify(deck)); } catch {}
+    return questionsById.get(deck.last);
+  }
+
+  function renderOptionContent(option) {
+    const separators = option.replace(/<math\b[^>]*>[\s\S]*?<\/math>/g, '');
+    const mathOnly = separators !== option && /^[\s、，,與及和或]*$/.test(separators);
+    return mathOnly ? '<span class="option-math-line">'+option+'</span>' : option;
+  }
+
   function shuffleOptions(question, random = Math.random) {
     if (!question.options) return question;
     const order = question.options.map((_, index) => index);
@@ -4025,7 +4081,7 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
   }
   function renderQuestion(){
     const multiple = q.type === 'multiple';
-    panel.innerHTML=`<p class="mobile-question-note">${targetFish.kind==='doll'?'洋娃娃':targetFish.kind==='item'?'道具':'魚兒'}已上鈎 · 完成作答後返回釣點</p><div class="question-top"><span class="tag">${multiple?'多選題':q.type==='choice'?'選擇題':'填充題'}</span><div class="catch-meter"><span class="meter-name">釣到率</span><div id="live-rate-bar" class="meter-track" role="progressbar" aria-label="答對時的釣到率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}"><span id="live-rate-fill" class="meter-fill" style="width:${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}%"></span><span class="meter-baseline" aria-hidden="true"></span></div><strong id="live-rate-value">${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}%</strong><small>基本 ${C.effectiveBaseRate(targetFish,save.collection)}%${C.catchBonus(save.collection)?`（收藏 +${C.catchBonus(save.collection)}%）`:''}</small></div></div><div class="question-prompt">${q.prompt}</div>${q.figure || ""}${q.diagram?A.diagram(q.diagram):''}<form id="answer-form">${q.options?`<div class="options" role="group" aria-label="答案選項">${q.options.map((option,i)=>`<button type="button" class="option" data-option="${i}" aria-pressed="false"><span class="letter">${'ABCD'[i]}</span><span class="option-content">${option}</span></button>`).join('')}</div>`:`${q.coordinateLabels?'':'<div class="entry-heading"><span class="input-label">輸入答案</span></div>'}<div id="answer-entry" class="answer-entry" role="group" aria-label="數學答案"></div><div class="keypad" aria-label="數學數字鍵盤">${['7','8','9','⌫','4','5','6','清空','1','2','3','分數','±','0','.','根號',...(q.expressionKeys?['−','×']:[])].map(key=>`<button type="button" data-key="${key}" class="${['⌫','清空','分數','根號'].includes(key)?'utility tool-key':['±','−','×'].includes(key)?'symbol':''}" aria-label="${{'⌫':'刪除一個字元','清空':'清空答案','分數':'插入分數','根號':'插入根號','±':'切換正負號','−':'減號','×':'乘號'}[key]||key}">${key}</button>`).join('')}</div>`}${q.type==='fill'?'<p id="input-error" class="error-text" role="status"></p>':''}${q.type!=='choice'?`<button id="submit-answer" class="primary-button" type="submit"${multiple?' disabled':''}>確認答案</button>`:''}</form>`;
+    panel.innerHTML=`<p class="mobile-question-note">${targetFish.kind==='doll'?'洋娃娃':targetFish.kind==='item'?'道具':'魚兒'}已上鈎 · 完成作答後返回釣點</p><div class="question-top"><span class="tag">${multiple?'多選題':q.type==='choice'?'選擇題':'填充題'}</span><div class="catch-meter"><span class="meter-name">釣到率</span><div id="live-rate-bar" class="meter-track" role="progressbar" aria-label="答對時的釣到率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}"><span id="live-rate-fill" class="meter-fill" style="width:${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}%"></span><span class="meter-baseline" aria-hidden="true"></span></div><strong id="live-rate-value">${Math.round(C.catchRate(true,0,targetFish,save.collection)*100)}%</strong><small>基本 ${C.effectiveBaseRate(targetFish,save.collection)}%${C.catchBonus(save.collection)?`（收藏 +${C.catchBonus(save.collection)}%）`:''}</small></div></div><div class="question-prompt">${q.prompt}</div>${q.figure || ""}${q.diagram?A.diagram(q.diagram):''}<form id="answer-form">${q.options?`<div class="options" role="group" aria-label="答案選項">${q.options.map((option,i)=>`<button type="button" class="option" data-option="${i}" aria-pressed="false"><span class="letter">${'ABCD'[i]}</span><span class="option-content">${renderOptionContent(option)}</span></button>`).join('')}</div>`:`${q.coordinateLabels?'':'<div class="entry-heading"><span class="input-label">輸入答案</span></div>'}<div id="answer-entry" class="answer-entry" role="group" aria-label="數學答案"></div><div class="keypad" aria-label="數學數字鍵盤">${['7','8','9','⌫','4','5','6','清空','1','2','3','分數','±','0','.','根號',...(q.expressionKeys?['−','×']:[])].map(key=>`<button type="button" data-key="${key}" class="${['⌫','清空','分數','根號'].includes(key)?'utility tool-key':['±','−','×'].includes(key)?'symbol':''}" aria-label="${{'⌫':'刪除一個字元','清空':'清空答案','分數':'插入分數','根號':'插入根號','±':'切換正負號','−':'減號','×':'乘號'}[key]||key}">${key}</button>`).join('')}</div>`}${q.type==='fill'?'<p id="input-error" class="error-text" role="status"></p>':''}${q.type!=='choice'?`<button id="submit-answer" class="primary-button" type="submit"${multiple?' disabled':''}>確認答案</button>`:''}</form>`;
     const optionButtons = [...panel.querySelectorAll('[data-option]')];
     optionButtons.forEach(button => button.addEventListener('click', () => {
       if (phase !== 'question') return;
