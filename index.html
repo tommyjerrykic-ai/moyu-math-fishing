@@ -644,9 +644,31 @@ body[data-location=classroom] [data-fullscreen]:not([aria-pressed=true]){color:#
 }
 .option-math-line > math { flex: 0 0 auto; }
 
+
+.option-content {
+  overflow-y: hidden;
+  padding-block: 6px;
+}
+.ipad-landscape-gate {
+  width: min(450px, calc(100vw - 40px));
+  padding: 32px 22px;
+  text-align: center;
+  background: #fbf5e4;
+  border: 2px solid #94a978;
+}
+.ipad-landscape-gate h1 { font-size: clamp(21px, 4vw, 30px); }
+.ipad-landscape-gate p { margin-top: 12px; color: #4e6b55; }
+.ipad-landscape-gate::backdrop { background: #243b30; }
+.ipad-portrait dialog:not(.ipad-landscape-gate),
+.ipad-portrait dialog:not(.ipad-landscape-gate)::backdrop { visibility: hidden; }
+
 </style>
 </head>
 <body>
+  <dialog id="ipad-landscape-gate" class="ipad-landscape-gate" aria-labelledby="ipad-landscape-title">
+    <h1 id="ipad-landscape-title">請將 iPad 轉為橫屏</h1>
+    <p>橫屏後即可繼續遊戲。</p>
+  </dialog>
   <section id="startup-notice" class="startup-notice" aria-labelledby="startup-title">
     <div class="startup-card">
       <p class="startup-kicker">摸魚研究所 · 遊戲啟動聲明</p>
@@ -4005,10 +4027,42 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
       A.fish($('mystery-fish'),C.FISH.find(f=>f.location===location)||C.FISH[0],true);
       if(location==='classroom'){panel.querySelector('h2').textContent=missed?'再試一次？':'等一個驚喜。';panel.querySelector('.simple-idle p').textContent='全魚種開放，開始在堂上釣魚。';status('來課室池塘釣一個驚喜吧。');}
     }$('change-location').addEventListener('click',()=>openLocations());$('idle-collection').addEventListener('click',openCollection);$('home-btn').addEventListener('click',()=>showScreen('home'));}
+  function isIPad(device) {
+    return /iPad/i.test(device.userAgent)
+      || (/Macintosh|MacIntel/i.test(device.userAgent + ' ' + device.platform)
+        && device.maxTouchPoints > 1);
+  }
+  const ipadPortrait = isIPad(navigator) ? matchMedia('(orientation: portrait)') : null;
+  const ipadGate = $('ipad-landscape-gate');
+  let rotateStarted = null;
+  let rotatePausedMs = 0;
+  function playClock() {
+    return (rotateStarted ?? performance.now()) - rotatePausedMs;
+  }
+  function syncIPadOrientation() {
+    if (ipadPortrait?.matches) {
+      if (rotateStarted !== null) return;
+      rotateStarted = performance.now();
+      document.body.classList.add('ipad-portrait');
+      ipadGate.showModal();
+    } else if (rotateStarted !== null) {
+      rotatePausedMs += performance.now() - rotateStarted;
+      rotateStarted = null;
+      document.body.classList.remove('ipad-portrait');
+      ipadGate.close();
+    }
+  }
+  if (ipadPortrait) {
+    ipadGate.addEventListener('cancel', event => event.preventDefault());
+    ipadPortrait.addEventListener('change', syncIPadOrientation);
+    syncIPadOrientation();
+  }
+
   function playMotion(type,duration){motion={type,started:performance.now(),duration};$('scene').dataset.action=type;}
-  function castLine(){if(!GameCloud.canPlay())return;if(screen!=='game'||!['idle','missed'].includes(phase)||spot().fishable===false)return;timing=C.biteTiming();castStart=performance.now();setPhase('casting');playMotion('cast',900);status('主角正在拋竿。');playEffect('cast');motionTimer=setTimeout(()=>{if(phase!=='casting')return;setPhase('waiting');$('scene').dataset.action='waiting';status('魚竿已拋出，留意水面……');playEffect('splash');},900);}
+  function castLine(){if(rotateStarted!==null||!GameCloud.canPlay())return;if(screen!=='game'||!['idle','missed'].includes(phase)||spot().fishable===false)return;timing=C.biteTiming();castStart=playClock();setPhase('casting');playMotion('cast',900);status('主角正在拋竿。');playEffect('cast');motionTimer=setTimeout(()=>{if(phase!=='casting')return;setPhase('waiting');$('scene').dataset.action='waiting';status('魚竿已拋出，留意水面……');playEffect('splash');},900);}
   function tick(){
-    const now=performance.now();
+    if (rotateStarted !== null) return;
+    const now=playClock();
     if(['waiting','bite'].includes(phase)){
       const ms=now-castStart, next=C.bitePhase(ms,timing);
 
@@ -4020,7 +4074,7 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
     if(phase==='question'&&questionStart)updateRateMeter((now-questionStart)/1000);
     // Game timing is independent of canvas rendering, including background tabs.
   }
-  function reelLine(){if(phase!=='bite')return;if(C.bitePhase(performance.now()-castStart,timing)!=='bite'){idle(true);return;}setPhase('hooking');playMotion('hook',650);status('主角正在提竿！');playEffect('reel');motionTimer=setTimeout(()=>{if(phase!=='hooking')return;targetFish=C.chooseFish(Math.random,location,save.collection);q=shuffleOptions(drawQuestion());save.questionIndex++;persist();selected=null;attempts=0;answerHistory=[];questionStart=0;motion=null;setPhase('question');$('scene').dataset.action='question';status(targetFish.kind==='doll'?'洋娃娃上鈎了！回答題目後收竿。':targetFish.kind==='item'?'神秘道具上鈎了！回答題目後收竿。':'魚咬穩了！回答題目後收竿。');renderQuestion();questionStart=performance.now();},650);}
+  function reelLine(){if(rotateStarted!==null||phase!=='bite')return;if(C.bitePhase(playClock()-castStart,timing)!=='bite'){idle(true);return;}setPhase('hooking');playMotion('hook',650);status('主角正在提竿！');playEffect('reel');motionTimer=setTimeout(()=>{if(phase!=='hooking')return;targetFish=C.chooseFish(Math.random,location,save.collection);q=shuffleOptions(drawQuestion());save.questionIndex++;persist();selected=null;attempts=0;answerHistory=[];questionStart=0;motion=null;setPhase('question');$('scene').dataset.action='question';status(targetFish.kind==='doll'?'洋娃娃上鈎了！回答題目後收竿。':targetFish.kind==='item'?'神秘道具上鈎了！回答題目後收竿。':'魚咬穩了！回答題目後收竿。');renderQuestion();questionStart=playClock();},650);}
   const questionsById = new Map(questions.map(question => [question.id, question]));
   const questionIds = [...questionsById.keys()];
   const questionBankVersion = questionIds.join(',');
@@ -4105,7 +4159,7 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
     $('study-panel').scrollTop=0;
   }
   function keyInput(key){if(phase!=='question'||!mathEntry)return;if(key==='分數'||key==='根號')mathEntry.insert(key==='分數'?'fraction':'radical');else mathEntry.key(key==='清空'?'清除':key);}
-  function submitAnswer(){if(phase!=='question'||!questionStart)return;let isCorrect, submittedAnswer;
+  function submitAnswer(){if(rotateStarted!==null||phase!=='question'||!questionStart)return;let isCorrect, submittedAnswer;
     if (q.type === 'multiple') {
       const chosen = [...panel.querySelectorAll('[data-option][aria-pressed="true"]')].map(button => Number(button.dataset.option));
       if (!chosen.length) return;
@@ -4131,7 +4185,7 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
         isCorrect = matches(value,q.answer);
       }
     }
-    answerHistory.push({answer:submittedAnswer ?? (q.type==='choice'?optionLog(selected):mathEntry.value()),correct:isCorrect,elapsedMs:Math.max(0,Math.round(performance.now()-questionStart))});
+    answerHistory.push({answer:submittedAnswer ?? (q.type==='choice'?optionLog(selected):mathEntry.value()),correct:isCorrect,elapsedMs:Math.max(0,Math.round(playClock()-questionStart))});
     attempts++;
     if(!isCorrect&&attempts===1){say('手滑了，再答一次',0);if(q.type==='choice'){const old=panel.querySelector(`[data-option="${selected}"]`);old.disabled=true;old.classList.remove('selected');old.setAttribute('aria-pressed','false');selected=null;} else if (q.type === 'multiple') {
       panel.querySelectorAll('[data-option]').forEach(button => {
@@ -4140,7 +4194,7 @@ ${_}`}var R=class extends Error{constructor({message:e,code:t,cause:s,name:n}){v
       });
       $('submit-answer').disabled = true;
     } else {mathEntry.clear();}if($('submit-answer'))$('submit-answer').textContent='確認重答';playEffect('retry');return;}
-    correct=isCorrect;elapsed=(performance.now()-questionStart)/1000;rate=C.catchRate(correct,elapsed,targetFish,save.collection);showFeedback();playEffect(correct?'correct':'retry');resolveCatch();
+    correct=isCorrect;elapsed=(playClock()-questionStart)/1000;rate=C.catchRate(correct,elapsed,targetFish,save.collection);showFeedback();playEffect(correct?'correct':'retry');resolveCatch();
   }
   function say(text,duration=3200,kind=''){$('character-speech').dataset.kind=kind;clearTimeout(speechTimer);$('speech-text').textContent=text;$('character-speech').hidden=false;if(duration)speechTimer=setTimeout(()=>$('character-speech').hidden=true,duration);}
   function showFeedback(){panel.innerHTML=`<div class="answer-review"><h2 class="feedback-heading">${correct?'答對了！':targetFish?.kind==='doll'?'娃娃溜走了。':targetFish?.kind==='item'?'道具掉回水中了。':'魚兒跑掉了。'}</h2><div class="explanation"><h3>正確答案</h3><div class="answer-display">${q.type==='choice'?`${'ABCD'[q.answer]}．`:''}${q.answerDisplay}</div><h3>解題說明</h3><div>${q.explanation}</div></div><button id="finish-review" class="primary-button ${correct?'mobile-review-continue':''}">繼續釣魚</button></div>`;$('finish-review').addEventListener('click',()=>{if(phase==='feedback')idle();});$('study-panel').scrollTop=0;}
